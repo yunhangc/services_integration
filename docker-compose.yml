@@ -1,0 +1,33 @@
+version: '2'
+services:
+  eventhub:
+    #where the Dockerfile is, this is done by the task "prepareDocker" in build.gradle
+    build: build/docker/
+    ports:
+      - "80:8080"
+      - "8123:8123"
+    container_name: eventhub
+    volumes:
+      - .:/code
+    links:
+      - mongo
+      - kafka
+#    logging:
+#      driver: syslog
+#      options:
+#        syslog-address: "tcp://192.168.99.100:8123"
+  mongo:
+    image: mongo
+    container_name: mongo
+    ports:
+      - "27017:27017"
+  kafka:
+    image: spotify/kafka
+    container_name: kafka
+    environment:
+      ADVERTISED_HOST: "192.168.99.100"
+      ADVERTISED_PORT: 9092
+    ports:
+      - "9092:9092"
+      - "2181:2181"
+

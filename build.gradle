@@ -1,0 +1,76 @@
+group 'com.afm'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext {
+        springBootVersion = '1.2.7.RELEASE'
+        springCloudHystrixVersion = '1.0.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("io.spring.gradle:dependency-management-plugin:0.5.2.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'io.spring.dependency-management'
+
+jar {
+    baseName = 'event_hub'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    compile.exclude module: "spring-boot-starter-tomcat"
+    all*.exclude module: "log4j-over-slf4j"
+    all*.exclude module: "slf4j-log4j12"
+}
+
+dependencies {
+    compile "org.springframework.cloud:spring-cloud-starter-hystrix"
+    compile "org.springframework.boot:spring-boot-starter-data-mongodb"
+    compile 'org.springframework.boot:spring-boot-starter'
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
+    compile 'org.springframework.cloud:spring-cloud-starter-hystrix-dashboard'
+    compile "org.springframework.boot:spring-boot-starter-jetty:1.2.5.RELEASE"
+    compile "org.apache.kafka:kafka_2.10:0.8.2.1"
+    compile "org.springframework.integration:spring-integration-kafka:1.1.1.RELEASE"
+//    compile "org.springframework.integration:spring-integration-java-dsl:1.1.0.M2"
+    compile 'com.google.code.gson:gson:2.3.1'
+    compile 'com.netflix.feign:feign-gson:8.10.0'
+    compile 'com.netflix.feign:feign-slf4j:8.10.0'
+
+}
+
+task prepareDocker(type: Copy, dependsOn: jar) {
+    println 'copy jar'
+    from 'build/libs/'
+    into 'build/docker/'
+    include '*.jar'
+    rename ('.*.jar', 'event_hub.jar')
+    from 'src/docker/'
+    into 'build/docker/'
+    include 'Dockerfile'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.6'
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-starter-parent:Angel.SR3"
+    }
+}
