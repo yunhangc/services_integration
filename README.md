@@ -8,3 +8,12 @@ This is the central hub for integration of all different micro-services for buil
 2. A micro-service subscribes to the hub with the consumer name and a call back URL. 
 3. when a message is pushed to kafka queue, the hub consume the message and find out which subscriber is the message for.
 4. the hub will loop through all the services the hub subscribes and post the message/object to all the url/microservices it subscribes to; after each post, the hub will also invoke the call back url in the subscription.
+
+## How to run it
+1. pull the project
+2. install docker and docker compose
+3. run: docker-compose up
+
+## To Scale
+1. Can deploy multiple Kafka containers 
+2. use nginx to loadbalance to the event hub. 
